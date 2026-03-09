@@ -1,6 +1,4 @@
-
-
-# 💊 MEDICINE PRICE COMPARISON SYSTEM
+#  MEDICINE PRICE COMPARISON SYSTEM
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/your-username/medicine-price-comparison?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/your-username/medicine-price-comparison?style=social)
@@ -19,7 +17,7 @@ The platform also provides **dedicated dashboards** for **Store Owners** and **A
 
 ---
 
-# 🚀 PROJECT OBJECTIVE
+#  PROJECT OBJECTIVE
 
 The main objective of this project is to create a system that helps users **save money and time** by easily comparing medicine prices from multiple pharmacies.
 
@@ -27,7 +25,7 @@ It also helps pharmacies **digitally manage their medicine inventory** and impro
 
 ---
 
-# ✨ FEATURES
+#  FEATURES
 
 ✔ Instant **medicine search**
 ✔ **Compare prices** from different pharmacies
@@ -40,9 +38,9 @@ It also helps pharmacies **digitally manage their medicine inventory** and impro
 
 ---
 
-# 🧩 SYSTEM MODULES
+#  SYSTEM MODULES
 
-## 👤 USER MODULE
+##  USER MODULE
 
 Users can:
 
@@ -54,7 +52,7 @@ Users can:
 
 ---
 
-## 🏪 STORE OWNER MODULE
+##  STORE OWNER MODULE
 
 Pharmacy owners can:
 
@@ -66,7 +64,7 @@ Pharmacy owners can:
 
 ---
 
-## 🛠 ADMIN MODULE
+##  ADMIN MODULE
 
 Administrators can:
 
@@ -75,49 +73,6 @@ Administrators can:
 * Monitor medicine listings
 * Maintain system data
 * Ensure system security
-
----
-
-# 🏗 SYSTEM ARCHITECTURE
-
-```
-User
-   │
-   ▼
-Frontend (React / HTML CSS JS)
-   │
-   ▼
-Backend (Node.js + Express)
-   │
-   ▼
-Database (MongoDB)
-```
-
----
-
-# 📂 PROJECT STRUCTURE
-
-```
-medicine-price-comparison
-│
-├── backend
-│   ├── routes
-│   ├── controllers
-│   ├── models
-│   └── server.js
-│
-├── frontend
-│   ├── public
-│   ├── src
-│   │   ├── components
-│   │   ├── pages
-│   │   └── App.js
-│
-├── database
-│
-├── README.md
-└── package.json
-```
 
 ---
 
@@ -193,9 +148,9 @@ http://localhost:3000
 
 ---
 
-# 🔐 LOGIN INFORMATION (EXAMPLE)
+#  LOGIN INFORMATION (EXAMPLE)
 
-## 👨‍💻 ADMIN LOGIN
+##  ADMIN LOGIN
 
 Email:
 
@@ -211,7 +166,7 @@ admin123
 
 ---
 
-## 🏪 STORE OWNER LOGIN
+##  STORE OWNER LOGIN
 
 Email:
 
@@ -227,13 +182,13 @@ store123
 
 ---
 
-## 👤 USER ACCESS
+##  USER ACCESS
 
 Users can **search medicines without login** depending on system configuration.
 
 ---
 
-# 🖥 SCREENSHOTS
+#  SCREENSHOTS
 
 (Add screenshots of your project here)
 
@@ -253,7 +208,7 @@ Example Markdown:
 
 ---
 
-# 🔌 API ENDPOINTS
+#  API ENDPOINTS
 
 ## Medicine API
 
@@ -293,7 +248,7 @@ View pharmacies.
 
 ---
 
-# 🛠 TECHNOLOGIES USED
+#  TECHNOLOGIES USED
 
 **Frontend**
 
@@ -319,16 +274,6 @@ View pharmacies.
 
 ---
 
-# 📈 FUTURE IMPROVEMENTS
-
-🚀 Mobile application version
-🚀 Online medicine ordering system
-🚀 Medicine stock notifications
-🚀 Integration with hospital systems
-🚀 AI-based medicine suggestions
-
----
-
 # 🤝 CONTRIBUTING
 
 Contributions are welcome!
@@ -342,44 +287,3 @@ Steps to contribute:
 5. Create a pull request
 
 ---
-
-# 👩‍💻 AUTHOR
-
-**Developed By**
-
-**Mila**
-
-Computer Science Student
-Project for academic learning and research.
-
----
-
-# 📜 LICENSE
-
-This project is created for **educational purposes**.
-You are free to modify and reuse it for learning.
-
----
-
-✅ **Pro Tip for GitHub (Important):**
-
-Create these folders to make your repo look **more professional**:
-
-```
-screenshots
-docs
-frontend
-backend
-```
-
----
-
-🔥 Mila, if you want, I can also make your README **10x more impressive** with:
-
-* ⭐ **Live Demo section**
-* 📊 **System workflow diagram**
-* 🎨 **UI preview section**
-* 📦 **Complete folder structure**
-* 📉 **Database schema diagram**
-
-It will look like a **final year / portfolio level GitHub project** that impresses professors and recruiters.
