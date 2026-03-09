@@ -1,6 +1,6 @@
 
 
-#💊 MEDICINE PRICE COMPARISON SYSTEM
+# 💊 MEDICINE PRICE COMPARISON SYSTEM
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/your-username/medicine-price-comparison?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/your-username/medicine-price-comparison?style=social)
