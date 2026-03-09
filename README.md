@@ -1,10 +1,5 @@
 #  MEDICINE PRICE COMPARISON SYSTEM
 
-![GitHub Repo stars](https://img.shields.io/github/stars/your-username/medicine-price-comparison?style=social)
-![GitHub forks](https://img.shields.io/github/forks/your-username/medicine-price-comparison?style=social)
-![License](https://img.shields.io/badge/license-Educational-blue)
-![Status](https://img.shields.io/badge/status-Active-success)
-
 The **Medicine Price Comparison System** is a **web-based application** that allows users to search and compare medicine prices from multiple pharmacies in one place.
 
 This system helps customers:
@@ -76,7 +71,7 @@ Administrators can:
 
 ---
 
-# ⚙️ INSTALLATION GUIDE
+#  INSTALLATION GUIDE
 
 Follow these steps to run the project locally.
 
@@ -188,26 +183,6 @@ Users can **search medicines without login** depending on system configuration.
 
 ---
 
-#  SCREENSHOTS
-
-(Add screenshots of your project here)
-
-Example:
-
-```
-/screenshots/homepage.png
-/screenshots/search-results.png
-/screenshots/admin-dashboard.png
-```
-
-Example Markdown:
-
-```
-![Homepage](screenshots/homepage.png)
-```
-
----
-
 #  API ENDPOINTS
 
 ## Medicine API
@@ -274,7 +249,7 @@ View pharmacies.
 
 ---
 
-# 🤝 CONTRIBUTING
+#  CONTRIBUTING
 
 Contributions are welcome!
 
