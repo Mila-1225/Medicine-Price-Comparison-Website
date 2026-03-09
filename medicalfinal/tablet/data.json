@@ -1,0 +1,233 @@
+{
+  "users": [
+    {
+      "user_id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "role": "ADMIN",
+      "name": "System Administrator",
+      "email": "admin@system.com"
+    },
+    {
+      "user_id": 2,
+      "username": "store1",
+      "password": "store123",
+      "role": "STORE_OWNER",
+      "name": "City Care Manager",
+      "email": "manager@citycare.com",
+      "store_id": 1
+    },
+    {
+      "user_id": 3,
+      "username": "store2",
+      "password": "store123",
+      "role": "STORE_OWNER",
+      "name": "HealthPlus Manager",
+      "email": "manager@healthplus.com",
+      "store_id": 2
+    },
+    {
+      "user_id": 4,
+      "username": "store3",
+      "password": "store123",
+      "role": "STORE_OWNER",
+      "name": "LifeLine Manager",
+      "email": "manager@lifeline.com",
+      "store_id": 3
+    },
+    {
+      "user_id": 5,
+      "username": "demon",
+      "password": "demon",
+      "role": "STORE_OWNER",
+      "store_id": 5
+    },
+    {
+      "user_id": 6,
+      "username": "pha1",
+      "password": "pha12345",
+      "role": "STORE_OWNER",
+      "store_id": 6
+    },
+    {
+      "user_id": 7,
+      "username": "pha2",
+      "password": "pha12345",
+      "role": "STORE_OWNER",
+      "store_id": 7
+    }
+  ],
+  "stores": [
+    {
+      "store_id": 1,
+      "name": "City Care Pharmacy",
+      "address": "Main Road",
+      "city": "Metro City",
+      "pincode": "123456",
+      "latitude": 40.7128,
+      "longitude": -74.006,
+      "phone": "1234567890",
+      "status": "APPROVED",
+      "created_at": "2025-01-01"
+    },
+    {
+      "store_id": 2,
+      "name": "HealthPlus Medicals",
+      "address": "Market Street",
+      "city": "Metro City",
+      "pincode": "123456",
+      "latitude": 40.758,
+      "longitude": -73.9855,
+      "phone": "0987654321",
+      "status": "APPROVED",
+      "created_at": "2025-01-02"
+    },
+    {
+      "store_id": 3,
+      "name": "LifeLine Pharmacy",
+      "address": "Hospital Area",
+      "city": "Metro City",
+      "pincode": "123456",
+      "latitude": 40.7489,
+      "longitude": -73.968,
+      "phone": "1122334455",
+      "status": "APPROVED",
+      "created_at": "2025-01-03"
+    },
+    {
+      "store_id": 4,
+      "name": "QuickMed Pharmacy",
+      "address": "Downtown Plaza",
+      "city": "Metro City",
+      "pincode": "123456",
+      "latitude": 40.7306,
+      "longitude": -73.9352,
+      "phone": "5556667777",
+      "status": "APPROVED",
+      "created_at": "2025-01-04"
+    },
+    {
+      "store_id": 5,
+      "name": "demon",
+      "address": "onnum illa ",
+      "city": "coimbatore",
+      "pincode": "222222",
+      "latitude": 11.012759428744186,
+      "longitude": 76.95510864834853,
+      "status": "APPROVED"
+    },
+    {
+      "store_id": 6,
+      "name": "pha1",
+      "address": "ukkadam",
+      "city": "coimbatore",
+      "pincode": "600001",
+      "latitude": 10.987848,
+      "longitude": 76.95823,
+      "status": "APPROVED"
+    },
+    {
+      "store_id": 7,
+      "name": "pha1",
+      "address": "12 injoinoduuwb dobo do .vcyhh123456",
+      "city": "coimbatore",
+      "pincode": "600001",
+      "latitude": 10.978741,
+      "longitude": 76.916063,
+      "status": "APPROVED"
+    }
+  ],
+  "medicines": [
+    {
+      "medicine_id": 1,
+      "name": "Paracetamol 500mg Tablet",
+      "brand": "BrandA",
+      "generic_name": "Paracetamol",
+      "composition": "Paracetamol 500mg",
+      "dosage": "500mg",
+      "form": "Tablet",
+      "description": "Pain reliever and fever reducer"
+    },
+    {
+      "medicine_id": 2,
+      "name": "Paracetamol 500mg Tablet",
+      "brand": "BrandB",
+      "generic_name": "Paracetamol",
+      "composition": "Paracetamol 500mg",
+      "dosage": "500mg",
+      "form": "Tablet",
+      "description": "Pain reliever and fever reducer"
+    },
+    {
+      "medicine_id": 3,
+      "name": "Ibuprofen 400mg Tablet",
+      "brand": "BrandC",
+      "generic_name": "Ibuprofen",
+      "composition": "Ibuprofen 400mg",
+      "dosage": "400mg",
+      "form": "Tablet",
+      "description": "Anti-inflammatory and pain reliever"
+    },
+    {
+      "medicine_id": 4,
+      "name": "Drug 11",
+      "brand": "rombus",
+      "generic_name": "fundalize",
+      "composition": "10-11",
+      "dosage": "11",
+      "category": "Tablet"
+    }
+  ],
+  "store_medicines": [
+    {
+      "store_medicine_id": 1,
+      "store_id": 1,
+      "medicine_id": 1,
+      "price": 20.0,
+      "discount_percent": 0.0,
+      "final_price": 20.0,
+      "availability": "IN_STOCK",
+      "last_updated_at": "2025-01-10"
+    },
+    {
+      "store_medicine_id": 2,
+      "store_id": 2,
+      "medicine_id": 1,
+      "price": 18.0,
+      "discount_percent": 5.0,
+      "final_price": 17.1,
+      "availability": "IN_STOCK",
+      "last_updated_at": "2025-01-10"
+    },
+    {
+      "store_medicine_id": 3,
+      "store_id": 3,
+      "medicine_id": 1,
+      "price": 22.0,
+      "discount_percent": 0.0,
+      "final_price": 22.0,
+      "availability": "IN_STOCK",
+      "last_updated_at": "2025-01-10"
+    },
+    {
+      "store_medicine_id": 4,
+      "store_id": 5,
+      "medicine_id": 1,
+      "price": 10.0,
+      "discount_percent": 22.0,
+      "final_price": 7.8,
+      "availability": "IN_STOCK",
+      "last_updated_at": "2026-01-17 01:26:16"
+    },
+    {
+      "store_medicine_id": 5,
+      "store_id": 7,
+      "medicine_id": 4,
+      "price": 20.0,
+      "discount_percent": 9.0,
+      "final_price": 18.2,
+      "availability": "IN_STOCK",
+      "last_updated_at": "2026-01-17 01:51:03"
+    }
+  ]
+}

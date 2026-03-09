@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Add Medicine{% endblock %}
+
+{% block content %}
+<h3>Add New Medicine</h3>
+
+<form method="post" class="mt-4">
+  <div class="form-group">
+    <label>Medicine Name</label>
+    <input type="text" name="name" class="form-control" required>
+  </div>
+
+  <div class="form-group">
+    <label>Brand</label>
+    <input type="text" name="brand" class="form-control">
+  </div>
+
+  <div class="form-group">
+    <label>Generic Name</label>
+    <input type="text" name="generic_name" class="form-control">
+  </div>
+
+  <div class="form-group">
+    <label>Composition</label>
+    <input type="text" name="composition" class="form-control" required>
+  </div>
+
+  <div class="form-group">
+    <label>Dosage</label>
+    <input type="text" name="dosage" class="form-control" required>
+  </div>
+
+  <div class="form-group">
+    <label>Category</label>
+    <select name="category" class="form-control">
+      <option>Tablet</option>
+      <option>Syrup</option>
+      <option>Capsule</option>
+      <option>Injection</option>
+      <option>Cream</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-success mt-3">
+    Save Medicine
+  </button>
+</form>
+{% endblock %}

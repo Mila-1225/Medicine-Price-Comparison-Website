@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Search Medicine</h2>
+
+    <div id="location-info" style="display:none; margin-bottom:10px;">
+        <p>
+            <strong>📍 Location detected:</strong>
+            <span id="location-text">Getting location...</span>
+        </p>
+        <p>
+            <small>
+                Showing results within
+                <strong><span id="radius-display">10</span> km</strong> radius
+            </small>
+        </p>
+    </div>
+
+    <div class="search-box">
+        <form method="get" action="/" id="search-form">
+            <input
+                type="text"
+                name="q"
+                id="q"
+                value="{{ query }}"
+                placeholder="Search by name, brand, or composition"
+            />
+
+            <!-- Hidden GPS fields -->
+            <input type="hidden" name="lat" id="lat" value="{{ request.args.get('lat','') }}">
+            <input type="hidden" name="lon" id="lon" value="{{ request.args.get('lon','') }}">
+
+            <!-- Radius selector -->
+            <select name="radius" id="radius" onchange="updateRadius()">
+                <option value="5" {% if request.args.get('radius') == '5' %}selected{% endif %}>5 km</option>
+                <option value="10" {% if request.args.get('radius','10') == '10' %}selected{% endif %}>10 km</option>
+                <option value="20" {% if request.args.get('radius') == '20' %}selected{% endif %}>20 km</option>
+            </select>
+
+            <button type="submit" class="btn">Search</button>
+            <button type="button" class="btn btn-secondary" onclick="getLocation()">Use My Location</button>
+
+            <a href="/medicals-map" class="btn btn-outline" style="margin-left:8px;">
+                View Stores on Map
+            </a>
+        </form>
+    </div>
+
+    {% if query %}
+        <p>Showing results for: <strong>{{ query }}</strong></p>
+    {% else %}
+        <p>Browse available medicines or search to compare prices</p>
+    {% endif %}
+</div>
+
+{% if medicines %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Medicine</th>
+                <th>Brand</th>
+                <th>Generic / Composition</th>
+                <th>Dosage</th>
+                <th>Form</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for med in medicines %}
+            <tr>
+                <td>{{ med.name }}</td>
+                <td>{{ med.brand }}</td>
+                <td>
+                    {{ med.generic_name }}<br>
+                    <small>{{ med.composition }}</small>
+                </td>
+                <td>{{ med.dosage }}</td>
+                <td>{{ med.form }}</td>
+                <td>
+                    <!-- ✅ FIXED URL (NO SPACES, NO 404) -->
+                    <a
+                      class="btn btn-small"
+                      href="{{ url_for(
+                          'medicine_detail',
+                          medicine_id=med.medicine_id,
+                          lat=request.args.get('lat'),
+                          lon=request.args.get('lon'),
+                          radius=request.args.get('radius',10)
+                      ) }}"
+                    >
+                      Compare Prices
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p>No medicines found.</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function updateRadius() {
+    const radius = document.getElementById("radius").value;
+    document.getElementById("radius-display").textContent = radius;
+}
+
+function getLocation() {
+    const info = document.getElementById("location-info");
+    const text = document.getElementById("location-text");
+
+    if (!navigator.geolocation) {
+        alert("Geolocation not supported");
+        return;
+    }
+
+    info.style.display = "block";
+    text.textContent = "Detecting location...";
+
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+
+            document.getElementById("lat").value = lat;
+            document.getElementById("lon").value = lon;
+
+            text.textContent =
+                `Latitude: ${lat.toFixed(4)}, Longitude: ${lon.toFixed(4)}`;
+
+            // auto-submit search with location
+            document.getElementById("search-form").submit();
+        },
+        err => {
+            text.textContent = "Location permission denied.";
+            console.error(err);
+        }
+    );
+}
+
+// Restore UI state from URL
+(function restoreState() {
+    const params = new URLSearchParams(window.location.search);
+    const lat = params.get("lat");
+    const lon = params.get("lon");
+    const radius = params.get("radius") || "10";
+
+    document.getElementById("radius-display").textContent = radius;
+
+    if (lat && lon) {
+        document.getElementById("location-info").style.display = "block";
+        document.getElementById("location-text").textContent =
+            `Latitude: ${parseFloat(lat).toFixed(4)}, Longitude: ${parseFloat(lon).toFixed(4)}`;
+    }
+})();
+</script>
+{% endblock %}

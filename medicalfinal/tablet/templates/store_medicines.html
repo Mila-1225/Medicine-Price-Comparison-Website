@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ store.name }}</h2>
+
+    <p>
+        {{ store.address }}, {{ store.city }} – {{ store.pincode }}<br>
+        {% if store.phone %}
+            📞 {{ store.phone }}
+        {% endif %}
+    </p>
+
+    {% if medicines %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Price</th>
+                    <th>Availability</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% set cheapest = medicines | map(attribute='price') | min %}
+            {% for med in medicines %}
+                <tr
+                  {% if med.price == cheapest %}
+                    style="background:#e6fffa; font-weight:600;"
+                  {% endif %}
+                >
+                    <td>{{ med.name }}</td>
+                    <td>
+                        ₹{{ "%.2f"|format(med.price) }}
+                        {% if med.price == cheapest %}
+                            <span style="color:green;">(Lowest)</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if med.availability == "IN_STOCK" %}
+                            <span style="color:green;">In Stock</span>
+                        {% else %}
+                            <span style="color:red;">Out of Stock</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No medicines available in this store.</p>
+    {% endif %}
+
+    <div style="margin-top:15px;">
+        <a href="/medicals-map" class="btn btn-secondary">
+            ← Back to Map
+        </a>
+    </div>
+</div>
+{% endblock %}

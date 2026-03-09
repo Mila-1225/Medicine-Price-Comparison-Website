@@ -1,0 +1,840 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="store-dashboard">
+    <!-- Store Header Card -->
+    <div class="dashboard-header">
+        <div class="store-info">
+            <div class="store-avatar">
+                <i class="fas fa-store"></i>
+            </div>
+            <div class="store-details">
+                <h1>{{ store["name"] }}</h1>
+                <div class="store-meta">
+                    <span class="meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ store["address"] }}, {{ store["city"] }}
+                    </span>
+                    <span class="meta-item">
+                        <i class="fas fa-hashtag"></i>
+                        Store ID: #{{ store["store_id"] if store.get("store_id") else "N/A" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="store-status">
+            {% if store["status"] == "APPROVED" %}
+                <div class="status-badge approved">
+                    <i class="fas fa-check-circle"></i>
+                    Approved
+                </div>
+            {% elif store["status"] == "PENDING" %}
+                <div class="status-badge pending">
+                    <i class="fas fa-clock"></i>
+                    Pending Approval
+                </div>
+            {% else %}
+                <div class="status-badge rejected">
+                    <i class="fas fa-times-circle"></i>
+                    Rejected
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Inventory Summary Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-pills"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ inventory|length if inventory else 0 }}</h3>
+                <p>Total Medicines</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ inventory|selectattr("availability", "equalto", "IN_STOCK")|list|length if inventory else 0 }}</h3>
+                <p>In Stock</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ (inventory|map(attribute="discount_percent")|max if inventory and inventory|map(attribute="discount_percent")|list else 0)|round(1) }}%</h3>
+                <p>Max Discount</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ inventory|map(attribute="final_price")|sum|round(2) if inventory else 0.00 }}</h3>
+                <p>Total Inventory Value</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Management Section -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2><i class="fas fa-boxes"></i> Medicine Inventory</h2>
+            <div class="section-actions">
+                <button class="btn btn-outline" onclick="toggleAddMedicineForm()">
+                    <i class="fas fa-plus"></i> Add Medicine
+                </button>
+                <button class="btn btn-icon">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
+
+        {% if inventory %}
+        <div class="table-responsive">
+            <table class="inventory-table">
+                <thead>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Discount</th>
+                        <th>Final Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in inventory %}
+                    <tr>
+                        <td class="medicine-info">
+                            <div class="medicine-name">{{ item.medicine["name"] }}</div>
+                            <div class="medicine-dosage">{{ item.medicine.get("dosage", "N/A") }}</div>
+                        </td>
+                        <td>
+                            <span class="brand-badge">{{ item.medicine["brand"] }}</span>
+                        </td>
+                        <td>
+                            <form method="post" action="{{ url_for('store_update_medicine') }}" class="inline-form">
+                                <input type="hidden" name="store_medicine_id" value="{{ item.store_medicine_id }}" />
+                                <div class="price-input">
+                                    <span class="currency">₹</span>
+                                    <input type="number" name="price" value="{{ item.price }}" step="0.01" min="0" />
+                                </div>
+                        </td>
+                        <td>
+                                <div class="discount-input">
+                                    <input type="number" name="discount" value="{{ item.discount_percent }}" step="0.1" min="0" max="100" />
+                                    <span class="percent">%</span>
+                                </div>
+                        </td>
+                        <td>
+                            <div class="final-price">
+                                <strong>₹{{ '%.2f'|format(item.final_price) }}</strong>
+                                {% if item.discount_percent > 0 %}
+                                <span class="discount-saved">Save ₹{{ '%.2f'|format(item.price - item.final_price) }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                                <div class="availability-toggle">
+                                    <select name="availability" class="status-select" onchange="this.form.submit()">
+                                        <option value="IN_STOCK" {% if item.availability == "IN_STOCK" %}selected{% endif %}>
+                                            <i class="fas fa-check-circle"></i> In Stock
+                                        </option>
+                                        <option value="OUT_OF_STOCK" {% if item.availability == "OUT_OF_STOCK" %}selected{% endif %}>
+                                            <i class="fas fa-times-circle"></i> Out of Stock
+                                        </option>
+                                    </select>
+                                </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button type="submit" class="btn-icon btn-update" title="Update">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                                </form>
+                                <a href="{{ url_for('store_delete_medicine', store_medicine_id=item.store_medicine_id) }}"
+                                   class="btn-icon btn-delete"
+                                   title="Delete"
+                                   onclick="return confirm('Are you sure you want to delete this medicine from your inventory?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h3>No Medicines in Inventory</h3>
+            <p>Your inventory is empty. Start by adding your first medicine.</p>
+            <button class="btn btn-primary" onclick="toggleAddMedicineForm()">
+                <i class="fas fa-plus"></i> Add First Medicine
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Add Medicine Form (Initially Hidden) -->
+    <div class="dashboard-section add-medicine-form" id="addMedicineForm" style="display: none;">
+        <div class="section-header">
+            <h2><i class="fas fa-plus-circle"></i> Add New Medicine</h2>
+            <button class="btn btn-icon" onclick="toggleAddMedicineForm()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('store_add_medicine') }}" class="add-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="medicine_id" class="form-label">
+                        <i class="fas fa-capsules"></i> Select Medicine
+                    </label>
+                   <select name="medicine_id" id="medicine_id" class="form-select" required>
+    <option value="">-- Choose a medicine --</option>
+    {% for med in medicines %}
+        <option value="{{ med.get('medicine_id') }}">
+            {{ med.get('name','Unnamed') }}
+            - {{ med.get('brand','No Brand') }}
+            {% if med.get('dosage') %} ({{ med.get('dosage') }}) {% endif %}
+            {% if med.get('composition') %} - {{ med.get('composition') }} {% endif %}
+        </option>
+    {% endfor %}
+</select>
+
+                    <div class="form-hint">Search for medicine by name or brand</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="price" class="form-label">
+                        <i class="fas fa-rupee-sign"></i> Price
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                        <input type="number" name="price" id="price" step="0.01" min="0" required
+                               placeholder="0.00" class="form-input" />
+                    </div>
+                    <div class="form-hint">Selling price per unit</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="discount" class="form-label">
+                        <i class="fas fa-percentage"></i> Discount
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-percentage"></i>
+                        <input type="number" name="discount" id="discount" step="0.1" min="0" max="100"
+                               value="0" placeholder="0" class="form-input" />
+                    </div>
+                    <div class="form-hint">Discount percentage (0-100)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="availability" class="form-label">
+                        <i class="fas fa-box"></i> Availability
+                    </label>
+                    <select name="availability" id="availability" class="form-select">
+                        <option value="IN_STOCK">In Stock</option>
+                        <option value="OUT_OF_STOCK">Out of Stock</option>
+                    </select>
+                    <div class="form-hint">Current stock status</div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="toggleAddMedicineForm()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add to Inventory
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Store Dashboard Styles */
+.store-dashboard {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Header Section */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px 30px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.store-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.store-avatar {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.store-details h1 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.store-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.status-badge {
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.status-badge.approved {
+    background: rgba(76, 217, 100, 0.2);
+    color: #4cd964;
+    border: 1px solid rgba(76, 217, 100, 0.3);
+}
+
+.status-badge.pending {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status-badge.rejected {
+    background: rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.3);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: #f0f4ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    font-size: 20px;
+}
+
+.stat-content h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-content p {
+    margin: 5px 0 0 0;
+    color: #666;
+    font-size: 13px;
+}
+
+/* Dashboard Sections */
+.dashboard-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Table Styles */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inventory-table thead {
+    background: #f8f9fa;
+}
+
+.inventory-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.inventory-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.medicine-info {
+    min-width: 200px;
+}
+
+.medicine-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.medicine-dosage {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.brand-badge {
+    background: #f0f4ff;
+    color: #667eea;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Form Elements in Table */
+.inline-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.price-input, .discount-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.price-input .currency, .discount-input .percent {
+    position: absolute;
+    left: 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+.price-input input, .discount-input input {
+    padding: 8px 10px 8px 25px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 100px;
+    font-size: 14px;
+}
+
+.discount-input input {
+    width: 80px;
+}
+
+.final-price {
+    min-width: 120px;
+}
+
+.discount-saved {
+    display: block;
+    font-size: 11px;
+    color: #28a745;
+    margin-top: 2px;
+}
+
+.status-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    min-width: 120px;
+    cursor: pointer;
+}
+
+.status-select option[value="IN_STOCK"] {
+    color: #28a745;
+}
+
+.status-select option[value="OUT_OF_STOCK"] {
+    color: #dc3545;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    transform: translateY(-2px);
+}
+
+.btn-update:hover {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.btn-delete:hover {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+/* Add Medicine Form */
+.add-form {
+    margin-top: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-select, .form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border 0.3s;
+}
+
+.form-select:focus, .form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.input-with-icon input {
+    padding-left: 40px;
+}
+
+.form-hint {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #667eea;
+    border: 1px solid #667eea;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.empty-icon {
+    font-size: 50px;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    margin: 0 0 10px 0;
+    color: #495057;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 25px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .store-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .store-meta {
+        justify-content: center;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .section-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .inline-form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .store-details h1 {
+        font-size: 22px;
+    }
+
+    .meta-item {
+        font-size: 12px;
+    }
+}
+</style>
+
+<script>
+/* ================= TOGGLE ADD MEDICINE FORM ================= */
+function toggleAddMedicineForm() {
+    const form = document.getElementById("addMedicineForm");
+
+    if (form.style.display === "none" || form.style.display === "") {
+        form.style.display = "block";
+        form.scrollIntoView({ behavior: "smooth" });
+    } else {
+        form.style.display = "none";
+    }
+}
+
+/* ================= AUTO SUBMIT INVENTORY AVAILABILITY ================= */
+document.addEventListener("change", function (e) {
+    if (e.target.classList.contains("status-select")) {
+        e.target.closest("form").submit();
+    }
+});
+
+/* ================= LIVE FINAL PRICE PREVIEW IN TABLE ================= */
+document.addEventListener("input", function (e) {
+
+    if (e.target.name === "discount") {
+        const row = e.target.closest("tr");
+        if (!row) return;
+
+        const priceInput = row.querySelector('input[name="price"]');
+        if (!priceInput) return;
+
+        const price = parseFloat(priceInput.value) || 0;
+        const discount = parseFloat(e.target.value) || 0;
+
+        const final = price - (price * discount / 100);
+
+        const finalPriceText = row.querySelector(".final-price strong");
+        const saved = row.querySelector(".discount-saved");
+
+        if (finalPriceText) finalPriceText.textContent = "₹" + final.toFixed(2);
+
+        if (saved) {
+            if (discount > 0) {
+                saved.style.display = "block";
+                saved.textContent = "Save ₹" + (price - final).toFixed(2);
+            } else {
+                saved.style.display = "none";
+            }
+        }
+    }
+
+});
+</script>
+
+{% endblock %}

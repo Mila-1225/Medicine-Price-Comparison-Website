@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Medicine Price Comparison</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* HEADER */
+header {
+    background: rgba(255,255,255,0.95);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    color: #667eea;
+}
+
+header nav {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+header nav a {
+    margin-left: 1rem;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+header nav a:hover {
+    color: #764ba2;
+}
+
+/* MAIN */
+main {
+    padding: 2rem;
+}
+
+/* CARD */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* TABLE */
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background: #f8f9fa;
+}
+
+/* BUTTONS */
+.btn {
+    padding: 0.6rem 1.2rem;
+    background: #667eea;
+    color: white;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn:hover {
+    background: #764ba2;
+}
+
+/* FOOTER */
+footer {
+    margin-top: 2rem;
+    background: rgba(255,255,255,0.9);
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.85rem;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 992px) {
+    header .container {
+        flex-direction: column;
+        text-align: center;
+    }
+    header nav {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+    th, td {
+        font-size: 0.85rem;
+        padding: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.1rem;
+    }
+    header nav a {
+        margin: 5px;
+        display: block;
+    }
+    .btn {
+        width: 100%;
+        margin-top: 5px;
+        text-align: center;
+    }
+    footer {
+        font-size: 0.7rem;
+    }
+}
+</style>
+
+{% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+<header>
+<div class="container">
+    <h1>Medicine Price Comparison</h1>
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+
+        {% if session.get('role') == 'ADMIN' %}
+            <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+            <a href="{{ url_for('logout') }}">Logout ({{ session.get('username') }})</a>
+
+        {% elif session.get('role') == 'STORE_OWNER' %}
+            <a href="{{ url_for('store_dashboard') }}">My Store</a>
+            <a href="{{ url_for('logout') }}">Logout ({{ session.get('username') }})</a>
+
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </nav>
+</div>
+</header>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+Intelligent Medicine Price Comparison System
+</footer>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

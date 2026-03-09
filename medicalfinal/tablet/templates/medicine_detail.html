@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="card">
+        <a href="{{ url_for('index') }}?lat={{ request.args.get('lat', '') }}&lon={{ request.args.get('lon', '') }}" class="btn btn-secondary btn-small">&larr; Back to search</a>
+
+        <h2 style="margin-top: 1rem;">{{ medicine["name"] }}</h2>
+        <p>
+            <strong>Brand:</strong> {{ medicine["brand"] or 'N/A' }}<br />
+            <strong>Generic name:</strong> {{ medicine["generic_name"] or 'N/A' }}<br />
+            <strong>Composition:</strong> {{ medicine["composition"] or 'N/A' }}<br />
+            <strong>Dosage:</strong> {{ medicine["dosage"] or 'N/A' }}<br />
+            <strong>Form:</strong> {{ medicine["form"] or 'N/A' }}<br />
+        </p>
+        {% if medicine["description"] %}
+            <p><strong>Description:</strong> {{ medicine["description"] }}</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Price comparison</h3>
+        {% if store_prices %}
+            <p style="margin: 1rem 0;">
+                <span class="badge badge-success">Lowest: {{ '%.2f'|format(min_price) }}</span>
+                <span class="badge badge-danger">Highest: {{ '%.2f'|format(max_price) }}</span>
+                <span class="badge">Average: {{ '%.2f'|format(avg_price) }}</span>
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Store</th>
+                        <th>Location</th>
+                        {% if request.args.get('lat') %}<th>Distance</th>{% endif %}
+                        <th>Price</th>
+                        <th>Discount</th>
+                        <th>Final Price</th>
+                        <th>Availability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in store_prices %}
+                    <tr>
+                        <td><strong>{{ row["store_name"] }}</strong></td>
+                        <td>{{ row["address"] }}, {{ row["city"] }}</td>
+                        {% if request.args.get('lat') %}
+                            <td>
+                                {% if row["distance"] %}
+                                    {{ row["distance"] }} km
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                        <td>{{ '%.2f'|format(row["price"] ) }}</td>
+                        <td>{{ '%.1f'|format(row["discount_percent"] ) }}%</td>
+                        <td>
+                            <strong>{{ '%.2f'|format(row["final_price"] ) }}</strong>
+                            {% if row["final_price"] == min_price %}
+                                <span class="badge badge-success">Cheapest</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row["availability"] == "IN_STOCK" %}
+                                <span class="badge badge-success">In Stock</span>
+                            {% else %}
+                                <span class="badge badge-warning">Out of Stock</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No stores found with this medicine in your area.</p>
+        {% endif %}
+    </div>
+
+    {% if alternative_recommendations %}
+        <div class="card">
+            <h3>Alternative medicines (same composition)</h3>
+            <p><small>Save money by choosing an alternative with the same active ingredient</small></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Brand</th>
+                        <th>Cheapest Price</th>
+                        <th>Store</th>
+                        <th>Savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for alt in alternative_recommendations %}
+                    <tr>
+                        <td>{{ alt.medicine["name"] }}</td>
+                        <td>{{ alt.medicine["brand"] }}</td>
+                        <td><strong>{{ '%.2f'|format(alt.cheapest_price) }}</strong></td>
+                        <td>{{ alt.store_name }}, {{ alt.city }}</td>
+                        <td>
+                            {% set savings = min_price - alt.cheapest_price %}
+                            {% if savings > 0 %}
+                                <span class="badge badge-success">Save {{ '%.2f'|format(savings) }}</span>
+                            {% elif savings < 0 %}
+                                <span class="badge badge-warning">+{{ '%.2f'|format(-savings) }}</span>
+                            {% else %}
+                                <span class="badge">Same price</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

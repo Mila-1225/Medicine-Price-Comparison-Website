@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="card">
+        <h2>⚙️ Admin Dashboard</h2>
+        <p>Welcome, Administrator. Manage stores, medicines, and system data.</p>
+    </div>
+
+
+
+
+    <div class="grid">
+        <div class="stat-card">
+            <h3>{{ pending_stores|length }}</h3>
+            <p>Pending Approvals</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ approved_stores|length }}</h3>
+            <p>Approved Stores</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ medicines|length }}</h3>
+            <p>Total Medicines</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ users|length }}</h3>
+            <p>Total Users</p>
+        </div>
+    </div>
+
+    {% if pending_stores %}
+        <div class="card">
+            <h3>⏳ Pending Store Approvals</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Store Name</th>
+                        <th>Address</th>
+                        <th>City</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for store in pending_stores %}
+                    <tr>
+                        <td><strong>{{ store.name }}</strong></td>
+                        <td>{{ store.address }}</td>
+                        <td>{{ store.city }}</td>
+                        <td>{{ store.phone }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_approve_store', store_id=store.store_id) }}" class="btn btn-small btn-success">Approve</a>
+                            <a href="{{ url_for('admin_reject_store', store_id=store.store_id) }}" class="btn btn-small btn-danger" onclick="return confirm('Reject this store?')">Reject</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>✅ Approved Stores</h3>
+        {% if approved_stores %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Store Name</th>
+                        <th>Address</th>
+                        <th>City</th>
+                        <th>Phone</th>
+                        <th>Coordinates</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for store in approved_stores %}
+                    <tr>
+                        <td><strong>{{ store.name }}</strong></td>
+                        <td>{{ store.address }}</td>
+                        <td>{{ store.city }}</td>
+                        <td>{{ store.phone }}</td>
+                        <td>
+                            {% if store.latitude and store.longitude %}
+                                {{ '%.4f'|format(store.latitude) }}, {{ '%.4f'|format(store.longitude) }}
+                            {% else %}
+                                Not set
+                            {% endif %}
+                        </td>
+                        <td><span class="badge badge-success">{{ store.status }}</span></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No approved stores yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>💊 Medicine Catalog</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Brand</th>
+                    <th>Composition</th>
+                    <th>Dosage</th>
+                    <th>Form</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for med in medicines %}
+                <tr>
+                    <td>{{ med.name }}</td>
+                    <td>{{ med.brand }}</td>
+                    <td>{{ med.composition }}</td>
+                    <td>{{ med.dosage }}</td>
+                    <td>{{ med.form }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <a href="/register-store" class="btn btn-outline" style="margin-left:8px;">
+                add store
+            </a>
+
+            <a href="{{ url_for('admin_add_medicine') }}"
+   class="btn btn-primary mb-3">
+  ➕ Add New Medicine
+</a>
+
+{% endblock %}

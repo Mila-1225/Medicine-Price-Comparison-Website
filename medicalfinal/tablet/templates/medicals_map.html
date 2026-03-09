@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Medical Stores Map</title>
+
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+  <style>
+    body { margin: 0; font-family: Arial; }
+    #controls {
+      padding: 10px;
+      background: #f8f9fa;
+      display: flex;
+      gap: 10px;
+    }
+    #map { height: calc(100vh - 60px); }
+  </style>
+</head>
+
+<body>
+
+<div id="controls">
+  <input id="search" placeholder="Search store or city">
+  <select id="radius">
+    <option value="5">5 km</option>
+    <option value="10" selected>10 km</option>
+    <option value="20">20 km</option>
+  </select>
+  <button onclick="locateUser()">Use My Location</button>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+const stores = {{ stores | tojson }};
+let map, userMarker;
+let storeMarkers = [];
+let userLat = null;
+let userLon = null;
+
+map = L.map('map').setView([11.0168, 76.9558], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2-lat1) * Math.PI / 180;
+  const dLon = (lon2-lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2)**2 +
+    Math.cos(lat1*Math.PI/180) *
+    Math.cos(lat2*Math.PI/180) *
+    Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function renderStores() {
+  storeMarkers.forEach(m => map.removeLayer(m));
+  storeMarkers = [];
+
+  const radius = parseInt(document.getElementById("radius").value);
+  const query = document.getElementById("search").value.toLowerCase();
+
+  let filtered = stores.filter(s => {
+    if (query && !(
+      s.name.toLowerCase().includes(query) ||
+      s.city.toLowerCase().includes(query)
+    )) return false;
+
+    if (userLat && userLon) {
+      s.distance = haversine(userLat, userLon, s.latitude, s.longitude);
+      if (s.distance > radius) return false;
+    } else {
+      s.distance = null;
+    }
+
+    return true;
+  });
+
+  // 🔥 SORT BY CHEAPEST MEDICINE
+  filtered.sort((a, b) => {
+    if (a.cheapest_price === null) return 1;
+    if (b.cheapest_price === null) return -1;
+    return a.cheapest_price - b.cheapest_price;
+  });
+
+  filtered.forEach(store => {
+    const icon = L.icon({
+      iconUrl: store.cheapest_price !== null
+        ? "https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png"
+        : "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png",
+      iconSize: [32, 32]
+    });
+
+    const popupText = `
+      <strong>${store.name}</strong><br>
+      ${store.address}, ${store.city}<br>
+      ${store.distance !== null ? `Distance: ${store.distance.toFixed(2)} km<br>` : ""}
+      ${store.cheapest_price !== null
+        ? `Cheapest price: ₹${store.cheapest_price}<br>`
+        : "No medicines available<br>"}
+      <a href="/store/${store.store_id}/medicines">View medicines</a>
+    `;
+
+    const marker = L.marker(
+      [store.latitude, store.longitude],
+      { icon }
+    ).addTo(map).bindPopup(popupText);
+
+    storeMarkers.push(marker);
+  });
+}
+
+function locateUser() {
+  navigator.geolocation.getCurrentPosition(pos => {
+    userLat = pos.coords.latitude;
+    userLon = pos.coords.longitude;
+
+    if (userMarker) map.removeLayer(userMarker);
+
+    userMarker = L.marker([userLat, userLon]).addTo(map);
+    map.setView([userLat, userLon], 13);
+
+    renderStores();
+  });
+}
+
+document.getElementById("radius").onchange = renderStores;
+document.getElementById("search").oninput = renderStores;
+
+renderStores();
+</script>
+
+
+</body>
+</html>
